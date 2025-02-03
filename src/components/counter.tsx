@@ -1,13 +1,21 @@
-import { Text, TouchableOpacity, View, StyleSheet, Image } from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet, Image, Modal } from "react-native";
 import colors from "../global/colors";
 import { useContext, useEffect, useState } from "react";
 import ThemeContext from "../context/theme-context";
 import formatTime from "../utils/format-time";
 import { TCounter } from "../types/count";
 import { UseDatabase } from "../database/useDatabase";
+import ModalCounterInfo from "./modal-counter-info";
+
+interface props extends Omit<TCounter, 'finishDate' | 'startDate'> {
+  refresh: boolean
+  setRefresh: React.Dispatch<React.SetStateAction<boolean>>
+}
 
 
-export default function Counter({ id, name, count, time, status, interval }: Omit<TCounter, 'startDate' | 'finishDate'>) {
+export default function Counter(
+  { id, name, count, time, status, interval, refresh, setRefresh }: props
+) {
 
   const theme = useContext(ThemeContext)[0]
   const [stt, setStatus] = useState<string>(status)
@@ -16,6 +24,8 @@ export default function Counter({ id, name, count, time, status, interval }: Omi
 
   const [intervalID, setIntervalID] = useState<NodeJS.Timeout | null>()
   const [timeInterval, setTimeInterval] = useState<number>(interval)
+
+  const [modal, setModal] = useState<boolean>(false)
 
   const db = UseDatabase()
 
@@ -41,6 +51,10 @@ export default function Counter({ id, name, count, time, status, interval }: Omi
     setCount(counts + 1)
     setTimeInterval(0)
   }
+
+  useEffect(() => {
+    setRefresh(!refresh)
+  }, [modal])
 
   useEffect(() => {
 
@@ -102,8 +116,8 @@ export default function Counter({ id, name, count, time, status, interval }: Omi
   })
 
   return (
-    <View style={style.container}>
-      <TouchableOpacity onPress={() => handleIncrement()} style={{ width: '85%' }} disabled={stt === 'paused' ? true : false} >
+    <TouchableOpacity style={style.container} onLongPress={() => setModal(!modal)}>
+      <TouchableOpacity onPress={() => handleIncrement()} style={{ width: '85%' }} disabled={stt === 'paused' ? true : false}  >
         <View>
           <Text style={style.name} numberOfLines={1}>{name}</Text>
           <Text style={style.counts}>{counts}</Text>
@@ -131,8 +145,8 @@ export default function Counter({ id, name, count, time, status, interval }: Omi
           </TouchableOpacity>
         </View>
       }
-
-    </View>
+      <ModalCounterInfo isVisible={modal} setVisible={setModal} id={id} />
+    </TouchableOpacity >
   )
 }
 

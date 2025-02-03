@@ -35,6 +35,17 @@ export function UseDatabase() {
     }
   }
 
+  async function GetCount(id: number) {
+    try {
+      const query = `SELECT * FROM counts WHERE id = ${id}`
+      const response = database.getFirstAsync<TCounter>(query)
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+
   async function upCount(
     id: number, count: number, time: number, status: string,
     interval: number
@@ -62,5 +73,16 @@ export function UseDatabase() {
     }
   }
 
-  return { create, getCounts, upCount }
+  async function DeleteCount(id: number) {
+    const query = database.prepareAsync(`DELETE FROM counts WHERE id = $id`)
+    try {
+      (await query).executeAsync({
+        $id: id
+      })
+    } catch (error) {
+      throw error
+    }
+  }
+
+  return { create, getCounts, upCount, GetCount, DeleteCount }
 }

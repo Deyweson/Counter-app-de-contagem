@@ -8,9 +8,6 @@ import ThemeContext from './context/theme-context';
 import { TCounter } from './types/count';
 import { UseDatabase } from './database/useDatabase';
 
-
-
-
 export default function Index() {
 
   const [theme, setTheme] = useContext(ThemeContext)
@@ -62,6 +59,8 @@ export default function Index() {
             status={item.status}
             time={item.time}
             interval={item.interval}
+            refresh={refresh}
+            setRefresh={setRefresh}
           />}
       />
 

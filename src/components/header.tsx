@@ -1,8 +1,9 @@
 import { Alert, Button, Image, Modal, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import colors from "../global/colors";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ThemeContext from "../context/theme-context";
 import { UseDatabase } from "../database/useDatabase";
+import AddModalCounter from "./modal-add-counter";
 
 interface props {
   refresh: boolean
@@ -12,17 +13,15 @@ interface props {
 export default function Header({ refresh, setRefresh }: props) {
 
   const [theme, setTheme] = useContext(ThemeContext)
-  const db = UseDatabase()
+  const [modal, setModal] = useState<boolean>(false)
 
-  const handleAddCount = async () => {
-    try {
-      await db.create('teste')
-      setRefresh(!refresh)
-    } catch (er) {
-      console.log(er)
-      Alert.alert('Erro')
-    }
+  const openModal = () => {
+    setModal(!modal)
   }
+
+  useEffect(() => {
+    setRefresh(!refresh)
+  }, [modal])
 
   const style = StyleSheet.create({
     header: {
@@ -59,9 +58,10 @@ export default function Header({ refresh, setRefresh }: props) {
         <Switch value={theme === 'dark'} style={{ marginRight: 5 }} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
         <Image source={require('../assets/sun.png')} style={{ width: 20, height: 20, tintColor: theme === 'dark' ? colors.white : colors.black, }} />
       </View>
-      <TouchableOpacity style={style.addButton} onPress={() => handleAddCount()}>
+      <TouchableOpacity style={style.addButton} onPress={() => openModal()}>
         <Text style={{ color: colors.white }}>+</Text>
       </TouchableOpacity>
+      <AddModalCounter setVisible={setModal} isVisible={modal} />
     </View>
   )
 }
