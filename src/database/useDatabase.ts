@@ -73,6 +73,26 @@ export function UseDatabase() {
     }
   }
 
+  async function completCounter(
+    id: number
+  ) {
+    const query = database.prepareAsync(`
+      UPDATE counts 
+      SET
+      status = $status
+      WHERE id = $id
+    `)
+    try {
+      (await query).executeAsync({
+        $id: id,
+        $status: "completed"
+      })
+    } catch (er) {
+      console.log(er)
+      throw er
+    }
+  }
+
   async function DeleteCount(id: number) {
     const query = database.prepareAsync(`DELETE FROM counts WHERE id = $id`)
     try {
@@ -84,5 +104,5 @@ export function UseDatabase() {
     }
   }
 
-  return { create, getCounts, upCount, GetCount, DeleteCount }
+  return { create, getCounts, upCount, GetCount, DeleteCount, completCounter }
 }

@@ -5,6 +5,7 @@ import colors from "../global/colors"
 import { TCounter } from "../types/count"
 import { UseDatabase } from "../database/useDatabase"
 import { FormatDate } from "../utils/format-date"
+import formatTime from "../utils/format-time"
 
 interface props {
   isVisible: boolean
@@ -42,7 +43,7 @@ export default function ModalCounterInfo({ isVisible, setVisible, id }: props) {
 
   useEffect(() => {
     handleGetCount()
-  }, [])
+  }, [isVisible])
 
 
   return (
@@ -59,8 +60,8 @@ export default function ModalCounterInfo({ isVisible, setVisible, id }: props) {
           </View>
           <View style={{ gap: 20 }}>
             <Text style={[styles.modalText, { color: theme === 'dark' ? colors.white : colors.dark, }]}>Contagem: {count?.count}</Text>
-            <Text style={[styles.modalText, { color: theme === 'dark' ? colors.white : colors.dark, }]}>Tempo Total: {count?.time}</Text>
-            <Text style={[styles.modalText, { color: theme === 'dark' ? colors.white : colors.dark, }]}>Intervalo: {count?.interval}</Text>
+            <Text style={[styles.modalText, { color: theme === 'dark' ? colors.white : colors.dark, }]}>Tempo Total: {formatTime(count?.time || 0)}</Text>
+            <Text style={[styles.modalText, { color: theme === 'dark' ? colors.white : colors.dark, }]}>Intervalo: {formatTime(count?.interval || 0)}</Text>
             <Text style={[styles.modalText, { color: theme === 'dark' ? colors.white : colors.dark, }]}>Data de inicio: {FormatDate(count?.startDate || '')}</Text>
             {count?.finishDate && (
               <Text style={[styles.modalText, { color: theme === 'dark' ? colors.white : colors.dark, }]}>Data de finalização: {count?.finishDate}</Text>
