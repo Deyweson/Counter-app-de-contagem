@@ -1,4 +1,4 @@
-import { Alert, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ThemeContext from "../context/theme-context";
 import { useContext, useState } from "react";
 import colors from "../global/colors";
@@ -36,13 +36,19 @@ export default function AddModalCounter({ isVisible, setVisible }: props) {
 
   return (
     <Modal visible={isVisible} transparent={true} animationType="fade">
+
       <View style={{ flex: 1, alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.63)' }}>
+
         <View style={[styles.modalView, { backgroundColor: theme === 'dark' ? colors.dark : colors.white, marginTop: 50 }]} >
+
           <View style={styles.modalHeader}>
+
             <Text style={{ color: theme === 'dark' ? colors.white : colors.dark, fontSize: 25 }}>Novo Contador</Text>
-            <TouchableOpacity onPress={() => handleCloseModal()}>
-              <Text style={{ color: theme === 'dark' ? colors.white : colors.dark, fontSize: 25, padding: 10 }}>x</Text>
+
+            <TouchableOpacity onPress={() => handleCloseModal()} style={{ padding: 5 }}>
+              <Image source={require('../assets/close.png')} style={{ width: 20, height: 20, padding: 10, tintColor: theme === 'dark' ? colors.white : colors.black, }} />
             </TouchableOpacity>
+
           </View>
           <TextInput
             placeholderTextColor={theme === 'dark' ? colors.white : colors.dark}

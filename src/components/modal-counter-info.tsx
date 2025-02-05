@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { Alert, Button, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Alert, Button, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import ThemeContext from "../context/theme-context"
 import colors from "../global/colors"
 import { TCounter } from "../types/count"
@@ -53,9 +53,7 @@ export default function ModalCounterInfo({ isVisible, setVisible, id }: props) {
           <View style={styles.modalHeader}>
             <Text style={{ color: theme === 'dark' ? colors.white : colors.dark, fontSize: 25, width: '85%' }}>{count?.name}</Text>
             <TouchableOpacity style={{ padding: 20 }} onPress={() => setVisible(!isVisible)}>
-              <Text style={{ color: theme === 'dark' ? colors.white : colors.dark, fontSize: 25 }} >
-                x
-              </Text>
+              <Image source={require('../assets/close.png')} style={{ width: 20, height: 20, padding: 10, tintColor: theme === 'dark' ? colors.white : colors.black, }} />
             </TouchableOpacity>
           </View>
           <View style={{ gap: 20 }}>
@@ -78,7 +76,7 @@ export default function ModalCounterInfo({ isVisible, setVisible, id }: props) {
           </View>
         </View>
       </View>
-    </Modal>
+    </Modal >
   )
 }
 

@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View, StyleSheet, Image, Modal } from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet, Image, Modal, Alert } from "react-native";
 import colors from "../global/colors";
 import { useContext, useEffect, useState } from "react";
 import ThemeContext from "../context/theme-context";
@@ -29,6 +29,13 @@ export default function Counter(
 
   const db = UseDatabase()
 
+  const handleComplete = () => {
+    setStatus('completed')
+    db.completCounter(id)
+    if (intervalID) {
+      clearInterval(intervalID)
+    }
+  }
 
 
   const handlePause = () => {
@@ -37,10 +44,12 @@ export default function Counter(
   }
 
   const handleStart = () => {
+    if (stt === 'completed') return
     setStatus('running')
   }
 
   const handleDecrement = () => {
+    if (stt === 'completed') return
     if (counts === 0) {
       return
     }
@@ -48,6 +57,7 @@ export default function Counter(
   }
 
   const handleIncrement = () => {
+    if (stt === 'completed') return
     setCount(counts + 1)
     setTimeInterval(0)
   }
@@ -57,7 +67,6 @@ export default function Counter(
   }, [modal])
 
   useEffect(() => {
-
     if (stt === 'running') {
       const interval = setInterval(() => {
         setTime((tm) => tm + 1)
@@ -70,9 +79,17 @@ export default function Counter(
     }
   }, [stt])
 
+
+  const handleUpCounter = async () => {
+    try {
+      await db.upCount(id, counts, tm, stt, timeInterval)
+    } catch (error) {
+      Alert.alert("Error:", "Erro ao atualizar o contador")
+    }
+  }
+
   useEffect(() => {
-    console.log(id, counts, tm, stt, timeInterval)
-    db.upCount(id, counts, tm, stt, timeInterval)
+    handleUpCounter()
   }, [counts, tm, timeInterval, status, stt])
 
 
@@ -95,15 +112,15 @@ export default function Counter(
     },
     name: {
       fontSize: 20,
-      color: theme === 'dark' ? colors.white : colors.black,
+      color: stt === 'completed' ? colors.green : theme === 'dark' ? colors.white : colors.black,
     },
     counts: {
       fontSize: 50,
-      color: theme === 'dark' ? colors.white : colors.black,
+      color: stt === 'completed' ? colors.green : theme === 'dark' ? colors.white : colors.black,
     },
     time: {
       fontSize: 20,
-      color: theme === 'dark' ? colors.white : colors.black,
+      color: stt === 'completed' ? colors.green : theme === 'dark' ? colors.white : colors.black,
     },
     buttonsContainer: {
       padding: 5,
@@ -111,7 +128,7 @@ export default function Counter(
     image: {
       width: 20,
       height: 29,
-      tintColor: theme === 'dark' ? colors.white : colors.black,
+      tintColor: stt === 'completed' ? colors.green : theme === 'dark' ? colors.white : colors.black,
     }
   })
 
@@ -121,29 +138,38 @@ export default function Counter(
         <View>
           <Text style={style.name} numberOfLines={1}>{name}</Text>
           <Text style={style.counts}>{counts}</Text>
-          <Text style={style.time}>Intervalo: {formatTime(timeInterval)}</Text>
+          {stt !== 'completed' && (<Text style={style.time}>Intervalo: {formatTime(timeInterval)}</Text>)}
+
           <Text style={style.time}>Total: {formatTime(tm)}</Text>
         </View>
       </TouchableOpacity>
 
-      {stt === 'paused' ?
-        <View>
-          <TouchableOpacity style={style.buttonsContainer} onPress={() => handleStart()}>
-            <Image style={style.image} source={require("../assets/play.png")} resizeMode="contain" />
-          </TouchableOpacity>
-        </View>
-        :
-        <View>
-          <TouchableOpacity style={style.buttonsContainer} onPress={() => handlePause()}>
-            <Image style={style.image} source={require("../assets/pause.png")} resizeMode="contain" />
-          </TouchableOpacity>
-          <TouchableOpacity style={style.buttonsContainer} onPress={() => handleDecrement()}>
-            <Image style={style.image} source={require("../assets/reset.png")} resizeMode="contain" />
-          </TouchableOpacity>
-          <TouchableOpacity style={style.buttonsContainer}>
-            <Image style={style.image} source={require("../assets/complet.png")} resizeMode="contain" />
-          </TouchableOpacity>
-        </View>
+
+      {stt === 'completed' && (<View></View>)}
+
+      {stt === 'paused' &&
+        (
+          <View>
+            <TouchableOpacity style={style.buttonsContainer} onPress={() => handleStart()}>
+              <Image style={style.image} source={require("../assets/play.png")} resizeMode="contain" />
+            </TouchableOpacity>
+          </View>
+        )
+      }
+      {stt === 'running' &&
+        (
+          <View>
+            <TouchableOpacity style={style.buttonsContainer} onPress={() => handlePause()}>
+              <Image style={style.image} source={require("../assets/pause.png")} resizeMode="contain" />
+            </TouchableOpacity>
+            <TouchableOpacity style={style.buttonsContainer} onPress={() => handleDecrement()}>
+              <Image style={style.image} source={require("../assets/reset.png")} resizeMode="contain" />
+            </TouchableOpacity>
+            <TouchableOpacity style={style.buttonsContainer} onPress={() => handleComplete()}>
+              <Image style={style.image} source={require("../assets/complet.png")} resizeMode="contain" />
+            </TouchableOpacity>
+          </View>
+        )
       }
       <ModalCounterInfo isVisible={modal} setVisible={setModal} id={id} />
     </TouchableOpacity >
